@@ -1,0 +1,187 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: AwsImageService</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">com.udacity.image.service</a> ]
+</div>
+
+<h1>Coverage Summary for Class: AwsImageService (com.udacity.image.service)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AwsImageService</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/ 4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    64.3%
+  </span>
+  <span class="absValue">
+    (27/ 42)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package com.udacity.image.service;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import org.slf4j.Logger;
+<i>4</i>&nbsp;import org.slf4j.LoggerFactory;
+<i>5</i>&nbsp;import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
+<i>6</i>&nbsp;import software.amazon.awssdk.auth.credentials.AwsCredentials;
+<i>7</i>&nbsp;import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
+<i>8</i>&nbsp;import software.amazon.awssdk.core.SdkBytes;
+<i>9</i>&nbsp;import software.amazon.awssdk.regions.Region;
+<i>10</i>&nbsp;import software.amazon.awssdk.services.rekognition.RekognitionClient;
+<i>11</i>&nbsp;import software.amazon.awssdk.services.rekognition.model.DetectLabelsRequest;
+<i>12</i>&nbsp;import software.amazon.awssdk.services.rekognition.model.DetectLabelsResponse;
+<i>13</i>&nbsp;import software.amazon.awssdk.services.rekognition.model.Image;
+<i>14</i>&nbsp;import software.amazon.awssdk.services.rekognition.model.Label;
+<i>15</i>&nbsp;
+<i>16</i>&nbsp;import javax.imageio.ImageIO;
+<i>17</i>&nbsp;import java.awt.image.BufferedImage;
+<i>18</i>&nbsp;import java.io.ByteArrayOutputStream;
+<i>19</i>&nbsp;import java.io.IOException;
+<i>20</i>&nbsp;import java.io.InputStream;
+<i>21</i>&nbsp;import java.util.Properties;
+<i>22</i>&nbsp;import java.util.StringJoiner;
+<i>23</i>&nbsp;
+<i>24</i>&nbsp;/**
+<i>25</i>&nbsp; * Image Recognition Service that can identify cats. Requires aws credentials to be entered in config.properties to work.
+<i>26</i>&nbsp; * Steps to make work (optional):
+<i>27</i>&nbsp; * 1. Log into AWS and navigate to the AWS console
+<i>28</i>&nbsp; * 2. Search for IAM then click on Users in the IAM nav bar
+<i>29</i>&nbsp; * 3. Click Add User. Enter a user name and select Programmatic access
+<i>30</i>&nbsp; * 4. Next to Permissions. Select &#39;Attach existing policies directly&#39; and attack &#39;AmazonRekognitionFullAccess&#39;
+<i>31</i>&nbsp; * 5. Next through the remaining screens. Copy the &#39;Access key ID&#39; and &#39;Secret access key&#39; for this user.
+<i>32</i>&nbsp; * 6. Create a config.properties file in the src/main/resources dir containing the keys referenced in this class
+<i>33</i>&nbsp; * aws.id=[your access key id]
+<i>34</i>&nbsp; * aws.secret=[your Secret access key]
+<i>35</i>&nbsp; * aws.region=[an aws region of choice. For example: us-east-2]
+<i>36</i>&nbsp; */
+<i>37</i>&nbsp;public class AwsImageService implements ImageService {
+<i>38</i>&nbsp;
+<b class="fc"><i>39</i>&nbsp;    private Logger log = LoggerFactory.getLogger(AwsImageService.class);</b>
+<i>40</i>&nbsp;
+<i>41</i>&nbsp;    //aws recommendation is to maintain only a single instance of client objects
+<i>42</i>&nbsp;    private static RekognitionClient rekognitionClient;
+<i>43</i>&nbsp;
+<i>44</i>&nbsp;    public static void setRekognitionClient(RekognitionClient rekognitionClient) {
+<b class="fc"><i>45</i>&nbsp;        AwsImageService.rekognitionClient = rekognitionClient;</b>
+<b class="fc"><i>46</i>&nbsp;    }</b>
+<i>47</i>&nbsp;
+<b class="fc"><i>48</i>&nbsp;    public AwsImageService() {</b>
+<b class="fc"><i>49</i>&nbsp;        Properties props = new Properties();</b>
+<i>50</i>&nbsp;        // TODO: Process check is null
+<b class="fc"><i>51</i>&nbsp;        try (InputStream is = getClass().getClassLoader().getResourceAsStream(&quot;config.properties&quot;)) {</b>
+<b class="fc"><i>52</i>&nbsp;            if (is == null) {</b>
+<b class="fc"><i>53</i>&nbsp;                log.error(&quot;config.properties file not found in the classpath&quot;);</b>
+<b class="fc"><i>54</i>&nbsp;                return;</b>
+<i>55</i>&nbsp;            }
+<b class="nc"><i>56</i>&nbsp;            props.load(is);</b>
+<b class="fc"><i>57</i>&nbsp;        } catch (IOException ioe) {</b>
+<b class="nc"><i>58</i>&nbsp;            log.error(&quot;Unable to initialize AWS Rekognition, error loading properties file&quot;, ioe);</b>
+<b class="nc"><i>59</i>&nbsp;            return;</b>
+<b class="nc"><i>60</i>&nbsp;        }</b>
+<i>61</i>&nbsp;
+<b class="nc"><i>62</i>&nbsp;        String awsId = props.getProperty(&quot;aws.id&quot;);</b>
+<b class="nc"><i>63</i>&nbsp;        String awsSecret = props.getProperty(&quot;aws.secret&quot;);</b>
+<b class="nc"><i>64</i>&nbsp;        String awsRegion = props.getProperty(&quot;aws.region&quot;);</b>
+<i>65</i>&nbsp;
+<b class="nc"><i>66</i>&nbsp;        AwsCredentials awsCredentials = AwsBasicCredentials.create(awsId, awsSecret);</b>
+<b class="nc"><i>67</i>&nbsp;        rekognitionClient = RekognitionClient.builder()</b>
+<b class="nc"><i>68</i>&nbsp;                .credentialsProvider(StaticCredentialsProvider.create(awsCredentials))</b>
+<b class="nc"><i>69</i>&nbsp;                .region(Region.of(awsRegion))</b>
+<b class="nc"><i>70</i>&nbsp;                .build();</b>
+<b class="nc"><i>71</i>&nbsp;    }</b>
+<i>72</i>&nbsp;
+<i>73</i>&nbsp;    /**
+<i>74</i>&nbsp;     * Returns true if the provided image contains a cat.
+<i>75</i>&nbsp;     *
+<i>76</i>&nbsp;     * @param image               Image to scan
+<i>77</i>&nbsp;     * @param confidenceThreshold Minimum threshhold to consider for cat. For example, 90.0f would require 90% confidence minimum
+<i>78</i>&nbsp;     * @return
+<i>79</i>&nbsp;     */
+<i>80</i>&nbsp;    public boolean imageContainsCat(BufferedImage image, float confidenceThreshold) {
+<b class="fc"><i>81</i>&nbsp;        Image awsImage = null;</b>
+<b class="fc"><i>82</i>&nbsp;        try (ByteArrayOutputStream os = new ByteArrayOutputStream()) {</b>
+<b class="fc"><i>83</i>&nbsp;            ImageIO.write(image, &quot;jpg&quot;, os);</b>
+<b class="fc"><i>84</i>&nbsp;            awsImage = Image.builder().bytes(SdkBytes.fromByteArray(os.toByteArray())).build();</b>
+<b class="fc"><i>85</i>&nbsp;        } catch (IOException ioe) {</b>
+<b class="nc"><i>86</i>&nbsp;            log.error(&quot;Error building image byte array&quot;, ioe);</b>
+<b class="nc"><i>87</i>&nbsp;            return false;</b>
+<b class="fc"><i>88</i>&nbsp;        }</b>
+<b class="fc"><i>89</i>&nbsp;        DetectLabelsRequest detectLabelsRequest = DetectLabelsRequest.builder().image(awsImage).minConfidence(confidenceThreshold).build();</b>
+<b class="fc"><i>90</i>&nbsp;        DetectLabelsResponse response = rekognitionClient.detectLabels(detectLabelsRequest);</b>
+<b class="fc"><i>91</i>&nbsp;        logLabelsForFun(response);</b>
+<b class="fc"><i>92</i>&nbsp;        return response.labels().stream().anyMatch(l -&gt; l.name().toLowerCase().matches(&quot;\\bcat\\b&quot;));</b>
+<i>93</i>&nbsp;    }
+<i>94</i>&nbsp;
+<i>95</i>&nbsp;    // Todo: Revert stream to for each for debug
+<i>96</i>&nbsp;    private void logLabelsForFun(DetectLabelsResponse response) {
+<b class="fc"><i>97</i>&nbsp;        StringJoiner joiner = new StringJoiner(&quot;, &quot;);</b>
+<b class="fc"><i>98</i>&nbsp;        for (Label label : response.labels()) {</b>
+<b class="fc"><i>99</i>&nbsp;            String format = String.format(&quot;%s(%.1f%%)&quot;, label.name(), label.confidence());</b>
+<b class="fc"><i>100</i>&nbsp;            joiner.add(format);</b>
+<b class="fc"><i>101</i>&nbsp;        }</b>
+<b class="fc"><i>102</i>&nbsp;        log.info(joiner.toString());</b>
+<b class="fc"><i>103</i>&nbsp;    }</b>
+<i>104</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-01-15 02:02</div>
+</div>
+</body>
+</html>

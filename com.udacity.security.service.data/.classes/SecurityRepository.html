@@ -1,0 +1,79 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: SecurityRepository</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">com.udacity.security.service.data</a> ]
+</div>
+
+<h1>Coverage Summary for Class: SecurityRepository (com.udacity.security.service.data)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">SecurityRepository</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package com.udacity.security.service.data;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import java.util.Set;
+<i>4</i>&nbsp;
+<i>5</i>&nbsp;/**
+<i>6</i>&nbsp; * Interface showing the methods our security repository will need to support
+<i>7</i>&nbsp; */
+<i>8</i>&nbsp;public interface SecurityRepository {
+<i>9</i>&nbsp;    void addSensor(Sensor sensor);
+<i>10</i>&nbsp;
+<i>11</i>&nbsp;    void removeSensor(Sensor sensor);
+<i>12</i>&nbsp;
+<i>13</i>&nbsp;    void updateSensor(Sensor sensor);
+<i>14</i>&nbsp;
+<i>15</i>&nbsp;    void setAlarmStatus(AlarmStatus alarmStatus);
+<i>16</i>&nbsp;
+<i>17</i>&nbsp;    void setArmingStatus(ArmingStatus armingStatus);
+<i>18</i>&nbsp;
+<i>19</i>&nbsp;    void resetAllSensors();
+<i>20</i>&nbsp;
+<i>21</i>&nbsp;    void catDetected(boolean cat);
+<i>22</i>&nbsp;
+<i>23</i>&nbsp;    boolean allSensorsInactive();
+<i>24</i>&nbsp;
+<i>25</i>&nbsp;    boolean isCatDetected();
+<i>26</i>&nbsp;
+<i>27</i>&nbsp;    Set&lt;Sensor&gt; getSensors();
+<i>28</i>&nbsp;
+<i>29</i>&nbsp;    AlarmStatus getAlarmStatus();
+<i>30</i>&nbsp;
+<i>31</i>&nbsp;    ArmingStatus getArmingStatus();
+<i>32</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-01-15 02:02</div>
+</div>
+</body>
+</html>
